@@ -10,6 +10,9 @@
             <button type="button" class="button-primary" @click="showTrackModal" v-if="shipment !== null">
                 Track Order
             </button>
+            <button type="button" class="button-primary" style="margin-top: 0.5rem" v-if="shipment !== null" @click="printOrder">
+                Print Order
+            </button>
         </div>
         <Spinner v-if="loading"></Spinner>
         <modal name="shipment-modal" height="auto" :scrollable="true" :clickToClose="clickToClose">
@@ -119,15 +122,22 @@
             </div>
         </modal>
         <modal name="track-modal" height="auto" :scrollable="true">
-            <div class="fizzpa-modal-dialog">
+            <div class="fizzpa-modal-dialog" v-if="shipment !== null">
                 <div class="fizzpa-modal-content">
                     <div class="fizzpa-modal-header">
                         <div class="modal-header-left">
                             Track Order No. {{ shipment.OrderId }}
                         </div>
                     </div>
-                    <div class="fizzpa-modal-body">
-                        Comming Soon...
+                    <div class="fizzpa-modal-body" v-if="tracking.length > 0">
+                        <div class="fizzpa-panel" v-for="track in tracking" :key="track.Trackid">
+                            <div class="fizzpa-panel-body">
+                                {{ track.WhereIN }} - <small>{{ track.TrackingDate }}</small>
+                            </div>
+                            <div class="fizzpa-panel-footer">
+                                {{ track.Note }}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -147,43 +157,57 @@ export default {
             clickToClose: true,
             form: {},
             shipment: null,
+            tracking: [],
         }
     },
     components: {
         Spinner,
     },
     async created() {
-        this.loading = true
+        await this.getData()
+    },
+    methods: {
+        async getData() {
+            this.loading = true
 
-        const urlParams = new URLSearchParams(window.location.search)
+            const urlParams = new URLSearchParams(window.location.search)
 
-        const response = await this.axios.get(fizzpa_i18n.admin_ajax, {
-            params: {
-                action: 'fizzpa_get_shipment',
-                order_id: urlParams.get('post'),
-                nonce: fizzpa_i18n.nonce
-            }
-        })
-
-        if (Array.isArray(response.data.data)) {
-            this.shipment = response.data.data[0]
-        } else {
-            const { data } = await this.axios.get(fizzpa_i18n.admin_ajax, {
+            const response = await this.axios.get(fizzpa_i18n.admin_ajax, {
                 params: {
-                    action: 'fizzpa_get_order_settings',
+                    action: 'fizzpa_get_shipment',
                     order_id: urlParams.get('post'),
-                    nonce: fizzpa_i18n.nonce,
+                    nonce: fizzpa_i18n.nonce
                 }
             })
 
-            this.form = data.data
-            this.form.action = 'fizzpa_shipment'
-            this.form.nonce = this.fizzpa_i18n.nonce
-        }
+            if (Array.isArray(response.data.data)) {
+                this.shipment = response.data.data[0]
 
-        this.loading = false
-    },
-    methods: {
+                const res = await this.axios.get(fizzpa_i18n.admin_ajax, {
+                    params: {
+                        action: 'fizzpa_tracking_order',
+                        order_id: urlParams.get('post'),
+                        nonce: fizzpa_i18n.nonce
+                    }
+                })
+
+                this.tracking = res.data.data
+            } else {
+                const { data } = await this.axios.get(fizzpa_i18n.admin_ajax, {
+                    params: {
+                        action: 'fizzpa_get_order_settings',
+                        order_id: urlParams.get('post'),
+                        nonce: fizzpa_i18n.nonce,
+                    }
+                })
+
+                this.form = data.data
+                this.form.action = 'fizzpa_shipment'
+                this.form.nonce = this.fizzpa_i18n.nonce
+            }
+
+            this.loading = false
+        },
         showModal() {
             this.$modal.show('shipment-modal')
         },
@@ -203,7 +227,13 @@ export default {
                 this.$toast.error(data.data.message)
             } else {
                 this.$toast.success(data.data.message)
+                this.$modal.hide('shipment-modal')
+                
+                await this.getData()
             }
+        },
+        printOrder() {
+            this.axios.get('')
         },
     }
 }

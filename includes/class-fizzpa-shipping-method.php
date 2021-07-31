@@ -24,7 +24,13 @@ class Fizzpa_Shipping_Method extends WC_Shipping_Method {
     }
 
     public function calculate_shipping($packages = []) {
-        //
+        if (! empty($this->settings['shipping_rate'])) {
+            $this->add_rate([
+                'id' => $this->id,
+                'title' => $this->title,
+                'cost' => (int) $this->settings['shipping_rate'],
+            ]);
+        }
     }
 
     public function init_form_fields() {
@@ -44,6 +50,10 @@ class Fizzpa_Shipping_Method extends WC_Shipping_Method {
                 'type' => 'number',
                 'min' => 1,
                 'default' => 1,
+            ],
+            'shipping_rate' => [
+                'title' => __('Shipping Rate', 'fizzpa'),
+                'type' => 'text',
             ],
         ];
     }

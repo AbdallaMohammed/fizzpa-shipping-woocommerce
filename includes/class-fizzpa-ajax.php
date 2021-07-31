@@ -12,6 +12,7 @@ class Fizzpa_Ajax {
         add_action('wp_ajax_fizzpa_get_order_settings', [$this, 'get_order_settings']);
         add_action('wp_ajax_fizzpa_shipment', [$this, 'create_shipment']);
         add_action('wp_ajax_fizzpa_get_shipment', [$this, 'get_shipment']);
+        add_action('wp_ajax_fizzpa_tracking_order', [$this, 'tracking_order']);
     }
 
     public function get_order_settings() {
@@ -69,7 +70,7 @@ class Fizzpa_Ajax {
         return wp_send_json_success([
             'SenderPhone' => $phone,
             'SenderName' => get_bloginfo('name'),
-            'RecipientCityId' => $order->get_billing_city(),
+            'RecipientCityId' => fizzpa_get_recipient_city_id($order),
             'RecipientName' => $order->get_user()->data->display_name,
             'RecipientPhone1' => $phone,
             'RecipientAddress' => $order->get_address('shipping')['address_1'],
@@ -143,6 +144,35 @@ class Fizzpa_Ajax {
         $settings = get_option('woocommerce_fizzpa_settings');
 
         $response = wp_remote_get('https://fizzapi.anyitservice.com/api/orders/' . $order_id, [
+            'timeout' => 30,
+            'redirection' => 5,
+            'httpversion' => '1.0',
+            'headers' => [
+                'Accept' => 'application/json',
+                'Authorization' => $settings['token'],
+                'Referer' => 'http://localhost',
+            ],
+        ]);
+
+        if (is_wp_error($response)) {
+            return wp_send_json_error($response);
+        }
+
+        return wp_send_json_success(json_decode($response['body']));
+    }
+
+    public function tracking_order() {
+        check_admin_referer('fizzpa_nonce', 'nonce');
+
+        $order_id = fizzba_get_order_id($_REQUEST['order_id']);
+
+        if (! $order_id) {
+            return wp_send_json_error();
+        }
+
+        $settings = get_option('woocommerce_fizzpa_settings');
+
+        $response = wp_remote_get('https://fizzapi.anyitservice.com/api/Tracking/' . $order_id, [
             'timeout' => 30,
             'redirection' => 5,
             'httpversion' => '1.0',

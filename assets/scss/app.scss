@@ -89,3 +89,28 @@
     }
   }
 }
+
+.fizzpa-panel {
+  border: 1px solid #E2E2E2;
+  margin-bottom: 20px;
+
+  .fizzpa-panel-body {
+    position: relative;
+    background: #fff;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px 4px 0 0;
+  }
+
+  .fizzpa-panel-footer {
+    border-radius: 0 0 4px 4px;
+    background: #FBFBFB;
+    border-top: 1px solid #E2E2E2;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
