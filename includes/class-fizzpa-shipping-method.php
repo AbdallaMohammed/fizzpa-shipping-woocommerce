@@ -55,6 +55,11 @@ class Fizzpa_Shipping_Method extends WC_Shipping_Method {
                 'title' => __('Shipping Rate', 'fizzpa'),
                 'type' => 'text',
             ],
+            'referer' => [
+                'title' => __('Referer', 'fizzpa'),
+                'type' => 'text',
+                'default' => 'http://localhost',
+            ],
         ];
     }
 }

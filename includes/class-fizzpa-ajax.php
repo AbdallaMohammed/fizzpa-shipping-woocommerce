@@ -13,6 +13,7 @@ class Fizzpa_Ajax {
         add_action('wp_ajax_fizzpa_shipment', [$this, 'create_shipment']);
         add_action('wp_ajax_fizzpa_get_shipment', [$this, 'get_shipment']);
         add_action('wp_ajax_fizzpa_tracking_order', [$this, 'tracking_order']);
+        add_action('wp_ajax_fizzpa_print_order', [$this, 'print_order']);
     }
 
     public function get_order_settings() {
@@ -96,7 +97,7 @@ class Fizzpa_Ajax {
             'headers' => [
                 'Accept' => 'application/json',
                 'Authorization' => $settings['token'],
-                'Referer' => 'http://localhost',
+                'Referer' => $settings['referer'],
             ],
             'body' => $_REQUEST,
         ]);
@@ -150,7 +151,7 @@ class Fizzpa_Ajax {
             'headers' => [
                 'Accept' => 'application/json',
                 'Authorization' => $settings['token'],
-                'Referer' => 'http://localhost',
+                'Referer' => $settings['referer'],
             ],
         ]);
 
@@ -179,7 +180,7 @@ class Fizzpa_Ajax {
             'headers' => [
                 'Accept' => 'application/json',
                 'Authorization' => $settings['token'],
-                'Referer' => 'http://localhost',
+                'Referer' => $settings['referer'],
             ],
         ]);
 
@@ -188,5 +189,24 @@ class Fizzpa_Ajax {
         }
 
         return wp_send_json_success(json_decode($response['body']));
+    }
+
+    public function print_order() {
+        check_admin_referer('fizzpa_nonce', 'nonce');
+
+        $order_id = fizzba_get_order_id($_REQUEST['order_id']);
+
+        if (! $order_id) {
+            return wp_send_json_error();
+        }
+
+        $settings = get_option('woocommerce_fizzpa_settings');
+
+        $language = esc_attr($_REQUEST['language']);
+        $size = esc_attr($_REQUEST['size']);
+
+        return wp_send_json_success([
+            'url' => 'https://fizzapi.anyitservice.com/api/orders/label/' . $order_id . '/' . $language . '/' . $size,
+        ]);
     }
 }
