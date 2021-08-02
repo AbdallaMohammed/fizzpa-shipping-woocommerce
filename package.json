@@ -39,6 +39,7 @@
     "weekstart": "^1.1.0"
   },
   "dependencies": {
+    "trim-newlines": "^3.0.1",
     "vue-js-modal": "^2.0.0-rc.6",
     "vue-simple-spinner": "^1.2.10"
   }
