@@ -56,7 +56,7 @@ if (! function_exists('fizzpa_get_recipient_city_id')) {
 
         $settings = get_option('woocommerce_fizzpa_settings');
 
-        $city = 'riyadh';
+        $city = $order->get_shipping_city();
         $lang = ! preg_match('/[^A-Za-z0-9]/', $string) ? 'en' : 'ar';
 
         $response = wp_remote_get('https://fizzapi.anyitservice.com/api/locations/cities/' . $city . '/' . $lang, [
@@ -64,8 +64,8 @@ if (! function_exists('fizzpa_get_recipient_city_id')) {
             'redirection' => 5,
             'httpversion' => '1.0',
             'headers' => [
-                'Authorization' => 'IVLC0PXQILMZ30OT8WGF8SUT3LFY65JUY3E6IBP755HER37GE5CYYIFYA0HOK8TLB1A8VRL6GIJDLQCAM8UA3T4PYP5Q2AX6M5CZ',
-                'Referer' => 'http://localhost',
+                'Authorization' => $settings['token'],
+                'Referer' => $settings['referer'],
             ],
         ]);
 
@@ -77,6 +77,45 @@ if (! function_exists('fizzpa_get_recipient_city_id')) {
 
         if ($body) {
             return $body->CityId;
+        }
+
+        return 1;
+    }
+}
+
+if (! function_exists('fizzpa_get_pickup_addresses')) {
+    function fizzpa_get_pickup_addresses() {
+        $settings = get_option('woocommerce_fizzpa_settings');
+
+        $data = [];
+        $addresses = wp_remote_get('https://fizzapi.anyitservice.com/api/locations/AgentAddress', [
+            'timeout' => 30,
+            'redirection' => 5,
+            'httpversion' => '1.0',
+            'headers' => [
+                'Accept' => 'application/json',
+                'Authorization' => $settings['token'],
+                'Referer' => $settings['referer'],
+            ],
+        ]);
+
+        if (! is_wp_error($addresses)) {
+            $addresses = json_decode($addresses['body'], true);
+            foreach ($addresses as $address) {
+                $data[$address['AddressNumber']] = $address['RegionName_Ar'];
+            }
+        }
+
+        return $data;
+    }
+}
+
+if (! function_exists('fizzpa_get_order_collection_type')) {
+    function fizzpa_get_order_collection_type($order) {
+        $payment_gateway = wc_get_payment_gateway_by_order($order);
+
+        if ($payment_gateway->id === 'cod') {
+            return 3;
         }
 
         return 1;

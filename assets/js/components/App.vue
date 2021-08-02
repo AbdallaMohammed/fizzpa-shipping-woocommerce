@@ -43,7 +43,15 @@
                             </div>
                             <div class="fizzpa-modal-form-row">
                                 <div class="fizzpa-modal-field-label">
-                                    <label>Recipient City ID</label>
+                                    <label>Sender Email</label>
+                                </div>
+                                <div class="fizzpa-modal-field">
+                                    <input type="email" v-model="form.SenderEmail">
+                                </div>
+                            </div>
+                            <div class="fizzpa-modal-form-row">
+                                <div class="fizzpa-modal-field-label">
+                                    <label>Recipient City</label>
                                 </div>
                                 <div class="fizzpa-modal-field">
                                     <input type="text" v-model="form.RecipientCityId">
@@ -51,10 +59,14 @@
                             </div>
                             <div class="fizzpa-modal-form-row">
                                 <div class="fizzpa-modal-field-label">
-                                    <label>Pickup Address ID</label>
+                                    <label>Pickup Address</label>
                                 </div>
                                 <div class="fizzpa-modal-field">
-                                    <input type="text" v-model="form.PickupAddressId">
+                                    <select v-model="form.PickupAddressId">
+                                        <option v-for="(name, key) in form.PickupAddresses" :key="key" :value="key">
+                                            {{ name }}
+                                        </option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="fizzpa-modal-form-row">

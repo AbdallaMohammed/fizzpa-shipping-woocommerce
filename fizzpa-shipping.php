@@ -105,6 +105,7 @@ function fizzpa_shipping_fields($fields) {
 add_filter('woocommerce_shipping_fields', 'fizzpa_shipping_fields');
 
 function fizzpa_init() {
+    require_once 'includes/functions.php';
     require_once 'includes/class-fizzpa-shipment.php';
 
     add_action('woocommerce_admin_order_data_after_shipping_address', [

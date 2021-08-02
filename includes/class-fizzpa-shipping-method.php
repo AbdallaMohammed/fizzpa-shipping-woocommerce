@@ -34,6 +34,8 @@ class Fizzpa_Shipping_Method extends WC_Shipping_Method {
     }
 
     public function init_form_fields() {
+        $data = fizzpa_get_pickup_addresses();
+
         $this->form_fields = [
             'enabled' => [
                 'title' => __('Enables', 'fizzpa'),
@@ -41,15 +43,27 @@ class Fizzpa_Shipping_Method extends WC_Shipping_Method {
                 'description' => __('Enable Fizzpa Shipping', 'fizzpa'),
                 'default' => 'yes',
             ],
+            'store_name' => [
+                'title' => __('Store Name', 'fizzpa'),
+                'type' => 'text',
+                'default' => get_bloginfo('name'),
+            ],
+            'store_phone' => [
+                'title' => __('Store Phone', 'fizzpa'),
+                'type' => 'tel',
+            ],
+            'store_email' => [
+                'title' => __('Store Email', 'fizzpa'),
+                'type' => 'email',
+            ],
             'token' => [
                 'title' => __('Auth Token', 'fizzpa'),
                 'type' => 'textarea',
             ],
             'pickup_address_id' => [
-                'title' => __('Pickup Address ID', 'fizzpa'),
-                'type' => 'number',
-                'min' => 1,
-                'default' => 1,
+                'title' => __('Pickup Address', 'fizzpa'),
+                'type' => 'select',
+                'options' => $data,
             ],
             'shipping_rate' => [
                 'title' => __('Shipping Rate', 'fizzpa'),

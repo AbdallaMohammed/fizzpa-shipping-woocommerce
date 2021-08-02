@@ -7,8 +7,6 @@ class Fizzpa_Ajax {
      * @since 1.0.0
      */
     public function init() {
-        require_once 'functions.php';
-
         add_action('wp_ajax_fizzpa_get_order_settings', [$this, 'get_order_settings']);
         add_action('wp_ajax_fizzpa_shipment', [$this, 'create_shipment']);
         add_action('wp_ajax_fizzpa_get_shipment', [$this, 'get_shipment']);
@@ -69,19 +67,21 @@ class Fizzpa_Ajax {
         }
 
         return wp_send_json_success([
-            'SenderPhone' => $phone,
-            'SenderName' => get_bloginfo('name'),
-            'RecipientCityId' => fizzpa_get_recipient_city_id($order),
+            'SenderPhone' => ! empty($settings['store_phone']) ? $settings['store_phone'] : '',
+            'SenderName' => ! empty($settings['store_name']) ? $settings['store_name'] : '',
+            'SenderEmail' => ! empty($settings['store_email']) ? $settings['store_email'] : '',
+            'RecipientCityId' => $order->get_shipping_city(),
             'RecipientName' => $order->get_user()->data->display_name,
             'RecipientPhone1' => $phone,
-            'RecipientAddress' => $order->get_address('shipping')['address_1'],
+            'RecipientAddress' => $order->get_shipping_address_1(),
             'OrderNote' => $order->get_customer_note(),
             'PickupAddressId' => ! empty($settings['pickup_address_id']) ? $settings['pickup_address_id'] : 1,
-            'OrderCollectionTypeId' => 3,
+            'OrderCollectionTypeId' => fizzpa_get_order_collection_type($order),
             'OrderPiecesCount' => (int) $order->get_item_count(),
             'CodAmount' => (int) $order->get_total(),
             'OrderTotalWeight' => $total_weight,
             'OrderRef' => $order->get_id(),
+            'PickupAddresses' => fizzpa_get_pickup_addresses(),
         ]);
     }
 
@@ -89,6 +89,8 @@ class Fizzpa_Ajax {
         check_admin_referer('fizzpa_nonce', 'nonce');
 
         $settings = get_option('woocommerce_fizzpa_settings');
+
+        $_REQUEST['RecipientCityId'] = fizzpa_get_recipient_city_id($_REQUEST['OrderRef']);
 
         $response = wp_remote_post('https://fizzapi.anyitservice.com/api/orders', [
             'timeout' => 30,
@@ -123,7 +125,7 @@ class Fizzpa_Ajax {
     
             $order = wc_get_order($_REQUEST['OrderRef']);
             $order->add_order_note($message);
-            $order->save();
+            $order->save(); 
     
             if (! empty($order)) {
                 $order->update_status('on-hold', __('Fizzba shipment created.', 'fizzba'));
