@@ -66,6 +66,8 @@ class Fizzpa_Ajax {
             }
         }
 
+        $settings = get_option('woocommerce_fizzpa_settings');
+
         return wp_send_json_success([
             'SenderPhone' => ! empty($settings['store_phone']) ? $settings['store_phone'] : '',
             'SenderName' => ! empty($settings['store_name']) ? $settings['store_name'] : '',
