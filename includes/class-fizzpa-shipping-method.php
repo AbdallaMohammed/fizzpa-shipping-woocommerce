@@ -43,19 +43,19 @@ class Fizzpa_Shipping_Method extends WC_Shipping_Method {
                 'description' => __('Enable Fizzpa Shipping', 'fizzpa'),
                 'default' => 'yes',
             ],
-            'store_name' => [
-                'title' => __('Store Name', 'fizzpa'),
-                'type' => 'text',
-                'default' => get_bloginfo('name'),
-            ],
-            'store_phone' => [
-                'title' => __('Store Phone', 'fizzpa'),
-                'type' => 'tel',
-            ],
-            'store_email' => [
-                'title' => __('Store Email', 'fizzpa'),
-                'type' => 'email',
-            ],
+            // 'store_name' => [
+            //     'title' => __('Store Name', 'fizzpa'),
+            //     'type' => 'text',
+            //     'default' => get_bloginfo('name'),
+            // ],
+            // 'store_phone' => [
+            //     'title' => __('Store Phone', 'fizzpa'),
+            //     'type' => 'tel',
+            // ],
+            // 'store_email' => [
+            //     'title' => __('Store Email', 'fizzpa'),
+            //     'type' => 'email',
+            // ],
             'token' => [
                 'title' => __('Auth Token', 'fizzpa'),
                 'type' => 'textarea',

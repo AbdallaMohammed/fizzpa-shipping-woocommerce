@@ -67,11 +67,12 @@ class Fizzpa_Ajax {
         }
 
         $settings = get_option('woocommerce_fizzpa_settings');
+        $user = $order->get_user();
 
         return wp_send_json_success([
-            'SenderPhone' => ! empty($settings['store_phone']) ? $settings['store_phone'] : '',
-            'SenderName' => ! empty($settings['store_name']) ? $settings['store_name'] : '',
-            'SenderEmail' => ! empty($settings['store_email']) ? $settings['store_email'] : '',
+            'SenderPhone' => $phone,
+            'SenderName' => $user->user_login,
+            'SenderEmail' => $email,
             'RecipientCityId' => $order->get_shipping_city(),
             'RecipientName' => $order->get_user()->data->display_name,
             'RecipientPhone1' => $phone,
