@@ -71,12 +71,13 @@ class Fizzpa_Ajax {
 
         return wp_send_json_success([
             'SenderPhone' => $phone,
-            'SenderName' => $user->user_login,
+            'SenderName' => $user->data->display_name,
             'SenderEmail' => $email,
-            'RecipientCityId' => $order->get_shipping_city(),
-            'RecipientName' => $order->get_user()->data->display_name,
+            'RecipientCityId' => fizzpa_get_order_city($order),
+            'RecipientName' => $user->data->display_name,
             'RecipientPhone1' => $phone,
-            'RecipientAddress' => $order->get_shipping_address_1(),
+            'RecipientAddress' => fizzpa_get_order_address_1($order),
+            'RecipientNeighborhood' => fizzpa_get_order_address_2($order),
             'OrderNote' => $order->get_customer_note(),
             'PickupAddressId' => ! empty($settings['pickup_address_id']) ? $settings['pickup_address_id'] : 1,
             'OrderCollectionTypeId' => fizzpa_get_order_collection_type($order),
