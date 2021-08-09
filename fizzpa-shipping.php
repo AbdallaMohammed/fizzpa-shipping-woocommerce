@@ -122,12 +122,16 @@ add_action('admin_init', [
 ]);
 
 function fizzpa_enqueue_scripts() {
-    wp_enqueue_style('fizzpa-app-css', plugin_dir_url(__FILE__) . 'public/css/app.css', [], '1.0.0');
+    $screen = get_current_screen();
 
-    wp_enqueue_script('fizzpa-app-js', plugin_dir_url(__FILE__) . 'public/js/app.js', [], '1.0.0', true);
-    wp_localize_script('fizzpa-app-js', 'fizzpa_i18n', [
-        'admin_ajax' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('fizzpa_nonce'),
-    ]);
+    if (is_admin() && $screen->id == 'woocommerce_page_wc-settings') {
+        wp_enqueue_style('fizzpa-app-css', plugin_dir_url(__FILE__) . 'public/css/app.css', [], '1.0.0');
+
+        wp_enqueue_script('fizzpa-app-js', plugin_dir_url(__FILE__) . 'public/js/app.js', [], '1.0.0', true);
+        wp_localize_script('fizzpa-app-js', 'fizzpa_i18n', [
+            'admin_ajax' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('fizzpa_nonce'),
+        ]);
+    }
 }
 add_action('admin_enqueue_scripts', 'fizzpa_enqueue_scripts');

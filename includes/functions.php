@@ -57,7 +57,7 @@ if (! function_exists('fizzpa_get_recipient_city_id')) {
         $settings = get_option('woocommerce_fizzpa_settings');
 
         $city = $order->get_shipping_city();
-        $lang = ! preg_match('/[^A-Za-z0-9]/', $string) ? 'en' : 'ar';
+        $lang = ! preg_match('/[^A-Za-z0-9]/', $city) ? 'en' : 'ar';
 
         $response = wp_remote_get('https://fizzapi.anyitservice.com/api/locations/cities/' . $city . '/' . $lang, [
             'timeout' => 30,
