@@ -124,7 +124,7 @@ add_action('admin_init', [
 function fizzpa_enqueue_scripts() {
     $screen = get_current_screen();
 
-    if (is_admin() && $screen->id == 'woocommerce_page_wc-settings') {
+    if (is_admin() && $screen->id == 'shop_order') {
         wp_enqueue_style('fizzpa-app-css', plugin_dir_url(__FILE__) . 'public/css/app.css', [], '1.0.0');
 
         wp_enqueue_script('fizzpa-app-js', plugin_dir_url(__FILE__) . 'public/js/app.js', [], '1.0.0', true);
