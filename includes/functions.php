@@ -167,3 +167,17 @@ if (! function_exists('fizzpa_get_order_address_2')) {
         return fizzpa_get_address_type() == 'shipping' ? $order->get_shipping_address_2() : $order->get_formatted_billing_address();
     }   
 }
+
+if (! function_exists('fizzpa_get_username')) {
+    function fizzpa_get_username($order) {
+        if (is_numeric($order)) {
+            $order = wc_get_order($order);
+        }
+
+        if (fizzpa_get_address_type() == 'shipping') {
+            return $order->get_shipping_first_name() . ' ' . $order->get_shipping_last_name();
+        }
+
+        return $order->get_billing_first_name() . ' ' . $order->get_billing_last_name();
+    }
+}

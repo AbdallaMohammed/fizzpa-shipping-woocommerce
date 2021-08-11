@@ -67,14 +67,13 @@ class Fizzpa_Ajax {
         }
 
         $settings = get_option('woocommerce_fizzpa_settings');
-        $user = $order->get_user();
 
         return wp_send_json_success([
             'SenderPhone' => $phone,
-            'SenderName' => $user->data->display_name,
+            'SenderName' => fizzpa_get_username($order),
             'SenderEmail' => $email,
             'RecipientCityId' => fizzpa_get_order_city($order),
-            'RecipientName' => $user->data->display_name,
+            'RecipientName' => fizzpa_get_username($order),
             'RecipientPhone1' => $phone,
             'RecipientAddress' => fizzpa_get_order_address_1($order),
             'RecipientNeighborhood' => fizzpa_get_order_address_2($order),
