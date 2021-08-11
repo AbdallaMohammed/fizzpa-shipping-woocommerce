@@ -56,6 +56,10 @@ if (! function_exists('fizzpa_get_recipient_city_id')) {
 
         $settings = get_option('woocommerce_fizzpa_settings');
 
+        if (empty($settings)) {
+            return 1;
+        }
+
         $city = $order->get_shipping_city();
         $lang = ! preg_match('/[^A-Za-z0-9]/', $city) ? 'en' : 'ar';
 
@@ -86,6 +90,10 @@ if (! function_exists('fizzpa_get_recipient_city_id')) {
 if (! function_exists('fizzpa_get_pickup_addresses')) {
     function fizzpa_get_pickup_addresses() {
         $settings = get_option('woocommerce_fizzpa_settings');
+
+        if (empty($settings)) {
+            return [];
+        }
 
         $data = [];
         $addresses = wp_remote_get('https://fizzapi.anyitservice.com/api/locations/AgentAddress', [
