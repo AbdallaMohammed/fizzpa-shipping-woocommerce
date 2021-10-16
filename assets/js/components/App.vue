@@ -189,7 +189,6 @@
                             <div class="fizzpa-modal-form-row">
                                 <button type="button" @click="printOrder" class="button-primary">Submit</button>
                             </div>
-                            <iframe v-if="iframeUrl !== ''" :src="iframeUrl" style="width: 100%"></iframe>
                         </div>
                     </div>
                 </div>
@@ -216,7 +215,6 @@ export default {
                 language: 'en',
                 size: 'A4',
             },
-            iframeUrl: '',
         }
     },
     components: {
@@ -300,14 +298,24 @@ export default {
             const { data } = await this.axios.get(fizzpa_i18n.admin_ajax, {
                 params: {
                     action: 'fizzpa_print_order',
-                    order_id: urlParams.get('post'),
                     nonce: fizzpa_i18n.nonce,
-                    size: this.print.size,
-                    language: this.print.language,
+                    order_id: urlParams.get('post'),
                 }
             })
 
-            this.iframeUrl = data.data.url
+            await this.axios.get(`https://fizzapi.anyitservice.com/api/orders/label/${data.data.order_id}/${this.print.language}/${this.print.size}`, {
+                headers: data.data.headers,
+                responseType: 'arraybuffer',
+            }).then((response) => {
+                const FileSaver = require('file-saver')
+                const blob = new Blob([response.data], {
+                    type: 'image/png',
+                })
+
+                FileSaver.saveAs(blob, `${data.data.order_id}.png`)
+
+                this.$toast.success('The order receipt has been saved successfully.')
+            })
         },
     }
 }

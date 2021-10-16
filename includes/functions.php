@@ -110,6 +110,10 @@ if (! function_exists('fizzpa_get_pickup_addresses')) {
         if (! is_wp_error($addresses)) {
             $addresses = json_decode($addresses['body'], true);
             foreach ($addresses as $address) {
+                if (! isset($address['AddressNumber']) || ! isset($address['Address'])) {
+                    continue;
+                }
+
                 $data[$address['AddressNumber']] = $address['Address'];
             }
         }
@@ -154,7 +158,7 @@ if (! function_exists('fizzpa_get_order_address_1')) {
             $order = wc_get_order($order);
         }
 
-        return fizzpa_get_address_type() == 'shipping' ? $order->get_shipping_address_1() : $order->get_formatted_billing_address();
+        return wp_strip_all_tags(fizzpa_get_address_type() == 'shipping' ? $order->get_shipping_address_1() : $order->get_formatted_billing_address());
     }   
 }
 
@@ -164,7 +168,7 @@ if (! function_exists('fizzpa_get_order_address_2')) {
             $order = wc_get_order($order);
         }
 
-        return fizzpa_get_address_type() == 'shipping' ? $order->get_shipping_address_2() : $order->get_formatted_billing_address();
+        return wp_strip_all_tags(fizzpa_get_address_type() == 'shipping' ? $order->get_shipping_address_2() : $order->get_formatted_billing_address());
     }   
 }
 

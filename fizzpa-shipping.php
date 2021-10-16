@@ -23,10 +23,51 @@ if (! defined('ABSPATH')) {
  * @since 1.0.0
  * @return void
  */
-function fizzpa_activation_check() {
-    //
+function fizzpa_is_requirements_meet() {
+    if (
+        version_compare(phpversion(), '7.2', '<')
+        ||
+        version_compare(get_bloginfo('version'), '5.2', '<')
+        ||
+        ! is_plugin_active('woocommerce/woocommerce.php')
+    ) {
+        add_action('admin_init', 'fizzpa_auto_deactivate');
+        add_action('admin_notices', 'fizzpa_activation_error');
+    }
 }
-register_activation_hook(__FILE__, 'fizzpa_activation_check');
+add_action('admin_init', 'fizzpa_is_requirements_meet');
+
+/**
+ * Auto deactivate plugin.
+ * 
+ * @return void
+ */
+function fizzpa_auto_deactivate() {
+    deactivate_plugins(plugin_basename(__FILE__));
+    if (isset($_GET['activate'])) {
+        unset($_GET['activate']);
+    }
+}
+
+/**
+ * Display activation error.
+ * 
+ * @return void
+ */
+function fizzpa_activation_error() {
+    $messages = [
+        sprintf(esc_html__('You are using the outdated WordPress, please update it to version %s or higher.', 'fizzpa'), '5.2'),
+        sprintf(esc_html__('Fizzpa requires PHP version %s or above. Please update PHP to run this plugin.', 'fizzpa' ), '7.2'),
+        sprintf(esc_html__('Fizzpa requires %s. Please install that plugin to run this plugin'), 'WooCommerce')
+    ];
+    ?>
+    <div class="notice fizzpa-notice notice-error">
+        <p>
+            <?php echo join('<br>', $messages) ?>
+        </p>
+    </div>
+    <?php
+}
 
 function fizzpa_shipping_method() {
     require_once 'includes/class-fizzpa-shipping-method.php';

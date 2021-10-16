@@ -45,13 +45,14 @@ class Fizzpa_Ajax {
         $items = $order->get_items();
 
         foreach ($items as $item) {
+            $item = $item->get_data();
             if ($item['product_id'] > 0) {
-                $product = $order->get_product_from_item($item);
+                $product = wc_get_product($item['product_id']);
                 if (! $product->is_virtual()) {
                     $product_data = $product->get_data();
 
                     if ($product->is_type('simple')) {
-                        $weight = $product_data['weight'];
+                        $weight = ! empty($product_data['weight']) ? $product_data['weight'] : 0;
                     } elseif ($product->is_type('variation')) {
                         if (empty($product_data['weight'])) {
                             $parent_weight = $product->get_parent_data();
@@ -68,7 +69,7 @@ class Fizzpa_Ajax {
 
         $settings = get_option('woocommerce_fizzpa_settings');
 
-        return wp_send_json_success([
+        $data = [
             'SenderPhone' => $phone,
             'SenderName' => fizzpa_get_username($order),
             'SenderEmail' => $email,
@@ -79,13 +80,19 @@ class Fizzpa_Ajax {
             'RecipientNeighborhood' => fizzpa_get_order_address_2($order),
             'OrderNote' => $order->get_customer_note(),
             'PickupAddressId' => ! empty($settings['pickup_address_id']) ? $settings['pickup_address_id'] : 1,
-            'OrderCollectionTypeId' => fizzpa_get_order_collection_type($order),
+            'OrderCollectionTypeId' => $collection_type = fizzpa_get_order_collection_type($order),
             'OrderPiecesCount' => (int) $order->get_item_count(),
-            'CodAmount' => (int) $order->get_total(),
             'OrderTotalWeight' => $total_weight,
             'OrderRef' => $order->get_id(),
             'PickupAddresses' => fizzpa_get_pickup_addresses(),
-        ]);
+            'CodAmount' => 0,
+        ];
+
+        if ($collection_type === 3) {
+            $data['CodAmount'] = (int) $order->get_total();
+        }
+
+        return wp_send_json_success($data);
     }
 
     public function create_shipment() {
@@ -199,19 +206,14 @@ class Fizzpa_Ajax {
     public function print_order() {
         check_admin_referer('fizzpa_nonce', 'nonce');
 
-        $order_id = fizzba_get_order_id($_REQUEST['order_id']);
-
-        if (! $order_id) {
-            return wp_send_json_error();
-        }
-
         $settings = get_option('woocommerce_fizzpa_settings');
 
-        $language = esc_attr($_REQUEST['language']);
-        $size = esc_attr($_REQUEST['size']);
-
         return wp_send_json_success([
-            'url' => 'https://fizzapi.anyitservice.com/api/orders/label/' . $order_id . '/' . $language . '/' . $size,
+            'headers' => [
+                'Accept' => 'application/pdf',
+                'Authorization' => $settings['token'],
+            ],
+            'order_id' => fizzba_get_order_id($_REQUEST['order_id']),
         ]);
     }
 }

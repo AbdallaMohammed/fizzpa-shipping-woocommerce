@@ -47,11 +47,6 @@ class Fizzpa_Shipping_Method extends WC_Shipping_Method {
                 'title' => __('Auth Token', 'fizzpa'),
                 'type' => 'textarea',
             ],
-            'pickup_address_id' => [
-                'title' => __('Pickup Address', 'fizzpa'),
-                'type' => 'select',
-                'options' => $data,
-            ],
             'address_type' => [
                 'title' => __('Address Type', 'fizzpa'),
                 'type' => 'select',
@@ -71,5 +66,13 @@ class Fizzpa_Shipping_Method extends WC_Shipping_Method {
                 'default' => 'http://localhost',
             ],
         ];
+
+        if (! empty($data)) {
+            $this->form_fields['pickup_address_id'] = [
+                'title' => __('Pickup Address', 'fizzpa'),
+                'type' => 'select',
+                'options' => $data,
+            ];
+        }
     }
 }

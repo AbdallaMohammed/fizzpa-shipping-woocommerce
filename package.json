@@ -21,7 +21,6 @@
     "lodash": "^4.17.21",
     "luxon": "^1.27.0",
     "mini-css-extract-plugin": "^1.5.0",
-    "node-sass": "^5.0.0",
     "postcss": "^8.2.10",
     "postcss-loader": "~5.2.0",
     "sass-loader": "^11.0.1",
@@ -39,6 +38,8 @@
     "weekstart": "^1.1.0"
   },
   "dependencies": {
+    "file-saver": "^2.0.5",
+    "node-sass": "^6.0.1",
     "trim-newlines": "^3.0.1",
     "vue-js-modal": "^2.0.0-rc.6",
     "vue-simple-spinner": "^1.2.10"
