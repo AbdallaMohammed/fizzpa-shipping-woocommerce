@@ -210,7 +210,6 @@ class Fizzpa_Ajax {
 
         return wp_send_json_success([
             'headers' => [
-                'Accept' => 'application/pdf',
                 'Authorization' => $settings['token'],
             ],
             'order_id' => fizzba_get_order_id($_REQUEST['order_id']),

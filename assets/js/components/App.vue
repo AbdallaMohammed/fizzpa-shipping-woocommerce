@@ -309,10 +309,10 @@ export default {
             }).then((response) => {
                 const FileSaver = require('file-saver')
                 const blob = new Blob([response.data], {
-                    type: 'image/png',
+                    type: 'image/jpeg',
                 })
 
-                FileSaver.saveAs(blob, `${data.data.order_id}.png`)
+                FileSaver.saveAs(blob, `${data.data.order_id}.jpeg`)
 
                 this.$toast.success('The order receipt has been saved successfully.')
             })
